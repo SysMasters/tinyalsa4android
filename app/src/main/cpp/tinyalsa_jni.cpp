@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "pcm_reader.cpp"
+#include "pcm_reader.h"
 
 #define UNUSED(x) (void)(x)
 

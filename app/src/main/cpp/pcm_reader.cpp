@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <tinyalsa/asoundlib.h>
+#include "pcm_reader.h"
+
 
 #define PCM_DEVICE 0
 #define PCM_CARD 0
@@ -9,14 +11,6 @@
 #define PCM_CHANNELS 2
 #define PCM_RATE 44100
 
-typedef void (*PcmDataCallback)(const void *buffer, size_t size);
-
-struct PcmReaderContext {
-    struct pcm *pcm;
-    pthread_t thread;
-    int running;
-    PcmDataCallback callback;
-};
 
 void *pcm_read_thread(void *arg) {
     struct PcmReaderContext *context = (struct PcmReaderContext *)arg;
@@ -38,7 +32,7 @@ void *pcm_read_thread(void *arg) {
 }
 
 struct PcmReaderContext *pcm_reader_init(PcmDataCallback callback) {
-    struct PcmReaderContext *context = static_cast<PcmReaderContext *>(malloc(
+    struct PcmReaderContext *context = reinterpret_cast<PcmReaderContext *>(malloc(
             sizeof(struct PcmReaderContext)));
     if (!context) return NULL;
 

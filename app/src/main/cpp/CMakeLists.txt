@@ -55,9 +55,10 @@ execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/version.sh -s print
 
 project("tinyalas")
 
-#set(CMAKE_C_STANDARD 99)
-#set(CMAKE_C_STANDARD_REQUIRED ON)
-#set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 
 # Options
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
@@ -83,7 +84,9 @@ set_property(TARGET "tinyalsa" PROPERTY PUBLIC_HEADER
         "include/tinyalsa/asoundlib.h"
         "include/tinyalsa/pcm.h"
         "include/tinyalsa/plugin.h"
-        "include/tinyalsa/mixer.h")
+        "include/tinyalsa/mixer.h"
+        "pcm_reader.h"
+)
 
 set_target_properties("tinyalsa" PROPERTIES
         VERSION ${TinyALSA_VERSION}
@@ -98,32 +101,32 @@ target_compile_definitions("tinyalsa" PRIVATE
 target_link_libraries("tinyalsa" PUBLIC ${CMAKE_DL_LIBS})
 
 # Examples
-if(TINYALSA_BUILD_EXAMPLES)
-    set(TINYALSA_EXAMPLES pcm-readi pcm-writei)
-else()
-    set(TINYALSA_EXAMPLES)
-endif()
-
-foreach(EXAMPLE IN LISTS TINYALSA_EXAMPLES)
-    add_executable("${EXAMPLE}" "examples/${EXAMPLE}.c")
-    target_link_libraries("${EXAMPLE}" PRIVATE "tinyalsa")
-endforeach()
+#if(TINYALSA_BUILD_EXAMPLES)
+#    set(TINYALSA_EXAMPLES pcm-readi pcm-writei)
+#else()
+#    set(TINYALSA_EXAMPLES)
+#endif()
+#
+#foreach(EXAMPLE IN LISTS TINYALSA_EXAMPLES)
+#    add_executable("${EXAMPLE}" "examples/${EXAMPLE}.c")
+#    target_link_libraries("${EXAMPLE}" PRIVATE "tinyalsa")
+#endforeach()
 
 # Utilities
-if(TINYALSA_BUILD_UTILS)
-    set(TINYALSA_UTILS tinyplay tinycap tinypcminfo tinymix tinywavinfo)
-else()
-    set(TINYALSA_UTILS)
-endif()
+#if(TINYALSA_BUILD_UTILS)
+#    set(TINYALSA_UTILS tinyplay tinycap tinypcminfo tinymix tinywavinfo)
+#else()
+#    set(TINYALSA_UTILS)
+#endif()
 
-foreach(UTIL IN LISTS TINYALSA_UTILS)
-    add_executable("${UTIL}" "utils/${UTIL}.c")
-    target_link_libraries("${UTIL}" PRIVATE "tinyalsa")
-endforeach()
-
-if(TINYALSA_BUILD_UTILS)
-    target_link_libraries("tinywavinfo" PRIVATE m)
-endif()
+#foreach(UTIL IN LISTS TINYALSA_UTILS)
+#    add_executable("${UTIL}" "utils/${UTIL}.c")
+#    target_link_libraries("${UTIL}" PRIVATE "tinyalsa")
+#endforeach()
+#
+#if(TINYALSA_BUILD_UTILS)
+#    target_link_libraries("tinywavinfo" PRIVATE m)
+#endif()
 
 # Add C warning flags
 #include(CheckCCompilerFlag)
@@ -138,11 +141,11 @@ endif()
 #        endforeach()
 #    endif()
 #endforeach()
-#
-## Install
-#include(GNUInstallDirs)
-#install(TARGETS "tinyalsa" ${TINYALSA_UTILS}
-#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tinyalsa)
+
+# Install
+include(GNUInstallDirs)
+install(TARGETS "tinyalsa" ${TINYALSA_UTILS}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tinyalsa)
