@@ -47,17 +47,17 @@
 #                       # included in the NDK.
 #                       ${log-lib} )
 
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.22.1)
 
 execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/version.sh -s print
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         OUTPUT_VARIABLE TINYALSA_VERSION)
 
-project("tinyalas" VERSION ${TINYALSA_VERSION} LANGUAGES C)
+project("tinyalas")
 
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
+#set(CMAKE_C_STANDARD 99)
+#set(CMAKE_C_STANDARD_REQUIRED ON)
+#set(CMAKE_C_EXTENSIONS ON)
 
 # Options
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
@@ -67,6 +67,8 @@ option(TINYALSA_BUILD_UTILS "Build utility tools" ON)
 
 # Library
 add_library("tinyalsa"
+        "pcm_reader.cpp"
+        "tinyalsa_jni.cpp"
         "src/pcm.c"
         "src/pcm_hw.c"
         "src/pcm_plugin.c"
@@ -124,23 +126,23 @@ if(TINYALSA_BUILD_UTILS)
 endif()
 
 # Add C warning flags
-include(CheckCCompilerFlag)
-foreach(FLAG IN ITEMS -Wall -Wextra -Wpedantic -Werror -Wfatal-errors)
-    string(TOUPPER "HAVE${FLAG}" HAVE_VAR)
-    string(REPLACE "-" "_" HAVE_VAR "${HAVE_VAR}")
-    check_c_compiler_flag("${FLAG}" "${HAVE_VAR}")
-    if("${${HAVE_VAR}}")
-        target_compile_options("tinyalsa" PRIVATE "${FLAG}")
-        foreach(UTIL IN LISTS TINYALSA_UTILS)
-            target_compile_options("${UTIL}" PRIVATE "${FLAG}")
-        endforeach()
-    endif()
-endforeach()
-
-# Install
-include(GNUInstallDirs)
-install(TARGETS "tinyalsa" ${TINYALSA_UTILS}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tinyalsa)
+#include(CheckCCompilerFlag)
+#foreach(FLAG IN ITEMS -Wall -Wextra -Wpedantic -Werror -Wfatal-errors)
+#    string(TOUPPER "HAVE${FLAG}" HAVE_VAR)
+#    string(REPLACE "-" "_" HAVE_VAR "${HAVE_VAR}")
+#    check_c_compiler_flag("${FLAG}" "${HAVE_VAR}")
+#    if("${${HAVE_VAR}}")
+#        target_compile_options("tinyalsa" PRIVATE "${FLAG}")
+#        foreach(UTIL IN LISTS TINYALSA_UTILS)
+#            target_compile_options("${UTIL}" PRIVATE "${FLAG}")
+#        endforeach()
+#    endif()
+#endforeach()
+#
+## Install
+#include(GNUInstallDirs)
+#install(TARGETS "tinyalsa" ${TINYALSA_UTILS}
+#        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tinyalsa)
