@@ -1,8 +1,6 @@
 #include <jni.h>
 #include "pcm_reader.h"
 
-#define UNUSED(x) (void)(x)
-
 static JavaVM *jvm = nullptr;
 static jobject javaCallback = nullptr;
 
@@ -14,7 +12,7 @@ void pcm_data_callback(const void *buffer, size_t size) {
     }
 
     jbyteArray data = env->NewByteArray(size);
-    env->SetByteArrayRegion(data, 0, size, reinterpret_cast<const jbyte *>(buffer));
+    env->SetByteArrayRegion(data, 0, size, (jbyte *) buffer);
 
     jclass cls = env->GetObjectClass(javaCallback);
     jmethodID methodID = env->GetMethodID(cls, "onPcmData", "([B)V");
@@ -26,16 +24,17 @@ void pcm_data_callback(const void *buffer, size_t size) {
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_jackstudio_tinyalas4android_PcmReader_nativeInit(JNIEnv *env, jobject obj,jint pcm_card, jint pcm_device) {
+Java_com_tinyalas4android_library_PcmReader_nativeInit(JNIEnv *env, jobject obj, jint pcm_card,
+                                                       jint pcm_device) {
     env->GetJavaVM(&jvm);
     javaCallback = env->NewGlobalRef(obj);
-    return reinterpret_cast<jlong>(pcm_reader_init(pcm_card,pcm_device,pcm_data_callback));
+    return (long) pcm_reader_init(pcm_card, pcm_device, pcm_data_callback);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_jackstudio_tinyalas4android_PcmReader_nativeDestroy(JNIEnv *env, jobject thiz,
-                                                             jlong handler) {
-    pcm_reader_destroy(reinterpret_cast<struct PcmReaderContext *>(handler));
+Java_com_tinyalas4android_library_PcmReader_nativeDestroy(JNIEnv *env, jobject thiz,
+                                                          jlong handler) {
+    pcm_reader_destroy((struct PcmReaderContext *) handler);
     env->DeleteGlobalRef(javaCallback);
 }

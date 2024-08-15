@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.tinyalas4android.library.PcmReader;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";

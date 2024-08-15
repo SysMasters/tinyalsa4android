@@ -1,4 +1,4 @@
-package com.jackstudio.tinyalas4android;
+package com.tinyalas4android.library;
 
 public class PcmReader {
     static {
