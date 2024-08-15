@@ -26,10 +26,10 @@ void pcm_data_callback(const void *buffer, size_t size) {
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_jackstudio_tinyalas4android_PcmReader_nativeInit(JNIEnv *env, jobject obj) {
+Java_com_jackstudio_tinyalas4android_PcmReader_nativeInit(JNIEnv *env, jobject obj,jint pcm_card, jint pcm_device) {
     env->GetJavaVM(&jvm);
     javaCallback = env->NewGlobalRef(obj);
-    return reinterpret_cast<jlong>(pcm_reader_init(pcm_data_callback));
+    return reinterpret_cast<jlong>(pcm_reader_init(pcm_card,pcm_device,pcm_data_callback));
 }
 
 extern "C"

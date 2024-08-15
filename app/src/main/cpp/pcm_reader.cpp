@@ -5,15 +5,8 @@
 #include "pcm_reader.h"
 
 
-#define PCM_DEVICE 0
-#define PCM_CARD 0
-#define PCM_FORMAT PCM_FORMAT_S16_LE
-#define PCM_CHANNELS 2
-#define PCM_RATE 44100
-
-
 void *pcm_read_thread(void *arg) {
-    struct PcmReaderContext *context = (struct PcmReaderContext *)arg;
+    struct PcmReaderContext *context = (struct PcmReaderContext *) arg;
     size_t size = pcm_frames_to_bytes(context->pcm, pcm_get_buffer_size(context->pcm));
     void *buffer = malloc(size);
 
@@ -31,19 +24,22 @@ void *pcm_read_thread(void *arg) {
     return NULL;
 }
 
-struct PcmReaderContext *pcm_reader_init(PcmDataCallback callback) {
+struct PcmReaderContext *pcm_reader_init(int pcm_card, int pcm_device, PcmDataCallback callback) {
     struct PcmReaderContext *context = reinterpret_cast<PcmReaderContext *>(malloc(
             sizeof(struct PcmReaderContext)));
     if (!context) return NULL;
 
     struct pcm_config config;
-    config.channels = PCM_CHANNELS;
-    config.rate = PCM_RATE;
-    config.format = PCM_FORMAT;
+    config.channels = 2;// 立体声
+    config.rate = 48000;
+    config.format = PCM_FORMAT_S32_LE;
     config.period_size = 1024;
     config.period_count = 4;
+//    config.start_threshold = 1024;
+//    config.silence_threshold = 1024 * 2;
+//    config.stop_threshold = 1024 * 2;
 
-    context->pcm = pcm_open(PCM_CARD, PCM_DEVICE, PCM_IN, &config);
+    context->pcm = pcm_open(pcm_card, pcm_device, PCM_IN, &config);
     if (!context->pcm || !pcm_is_ready(context->pcm)) {
         free(context);
         return NULL;
@@ -60,6 +56,7 @@ struct PcmReaderContext *pcm_reader_init(PcmDataCallback callback) {
 
     return context;
 }
+
 
 void pcm_reader_destroy(struct PcmReaderContext *context) {
     if (!context) return;

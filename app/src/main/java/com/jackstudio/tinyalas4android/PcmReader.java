@@ -13,16 +13,16 @@ public class PcmReader {
 
     private PcmDataCallback callback;
 
-    public PcmReader(PcmDataCallback callback) {
+    public PcmReader(int pcmCard, int pcmDevice, PcmDataCallback callback) {
         this.callback = callback;
-        nativeHandler = nativeInit();
+        nativeHandler = nativeInit(pcmCard, pcmDevice);
     }
 
     public void release() {
         nativeDestroy(nativeHandler);
     }
 
-    private native long nativeInit();
+    private native long nativeInit(int pcmCard, int pcmDevice);
 
     private native void nativeDestroy(long handler);
 
