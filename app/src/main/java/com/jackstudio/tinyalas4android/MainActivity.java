@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        pcmReader = new PcmReader(0, 0, data -> {
+        pcmReader = new PcmReader(4, 0, data -> {
             Log.i(TAG, "pcmReader: data = " + data.toString());
         });
     }

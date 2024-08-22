@@ -87,7 +87,10 @@ set_property(TARGET "tinyalsa" PROPERTY PUBLIC_HEADER
         "include/tinyalsa/mixer.h"
         "pcm_reader.h"
 )
-
+find_library(
+        log-lib
+        log
+)
 set_target_properties("tinyalsa" PROPERTIES
         VERSION ${TinyALSA_VERSION}
         SOVERSION ${TinyALSA_VERSION_MAJOR})
@@ -98,7 +101,9 @@ target_include_directories("tinyalsa" PUBLIC
 target_compile_definitions("tinyalsa" PRIVATE
         $<$<BOOL:${TINYALSA_USES_PLUGINS}>:TINYALSA_USES_PLUGINS>
         PUBLIC _POSIX_C_SOURCE=200809L)
-target_link_libraries("tinyalsa" PUBLIC ${CMAKE_DL_LIBS})
+target_link_libraries("tinyalsa" PUBLIC ${CMAKE_DL_LIBS}
+        ${log-lib}
+)
 
 # Examples
 #if(TINYALSA_BUILD_EXAMPLES)

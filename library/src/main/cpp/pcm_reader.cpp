@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <tinyalsa/asoundlib.h>
+#include <android/log.h>
+#include <string.h>
 #include "pcm_reader.h"
 
 
@@ -30,17 +32,21 @@ struct PcmReaderContext *pcm_reader_init(int pcm_card, int pcm_device, PcmDataCa
     if (!context) return NULL;
 
     struct pcm_config config;
-    config.channels = 2;// 立体声
-    config.rate = 48000;
-    config.format = PCM_FORMAT_S32_LE;
-    config.period_size = 1024;
-    config.period_count = 4;
-//    config.start_threshold = 1024;
-//    config.silence_threshold = 1024 * 2;
-//    config.stop_threshold = 1024 * 2;
+    memset(&config, 0, sizeof(config));
+    config.channels = 2; // 双声道
+    config.rate = 48000; // 采样率 48000Hz
+    config.period_size = 512; // 周期大小
+    config.period_count = 2; // 周期计数
+    config.format = PCM_FORMAT_S16_LE; // 16位小端序格式
+    config.start_threshold = 1;
+//    config.stop_threshold = 0;
+//    config.silence_threshold = 0;
 
     context->pcm = pcm_open(pcm_card, pcm_device, PCM_IN, &config);
     if (!context->pcm || !pcm_is_ready(context->pcm)) {
+        __android_log_print(ANDROID_LOG_DEBUG, "pcm_reader", "card:%d,device:%d,Unable to open PCM device (%s)",
+                          pcm_card,pcm_device,pcm_get_error(context->pcm));
+        fprintf(stderr, "Unable to open PCM device (%s)\n", pcm_get_error(context->pcm));
         free(context);
         return NULL;
     }
