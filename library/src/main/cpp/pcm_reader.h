@@ -5,7 +5,7 @@
 #include <pthread.h>
 
 // 数据回调函数类型定义
-typedef void (*PcmDataCallback)(const void *buffer, size_t size);
+typedef void (*PcmDataCallback)(const void *buffer, size_t size, long handler);
 
 // PCM读取上下文结构体定义
 struct PcmReaderContext {
@@ -18,6 +18,6 @@ struct PcmReaderContext {
 // 函数声明
 struct PcmReaderContext *pcm_reader_init(int pcm_card, int pcm_device, PcmDataCallback callback);
 
-void pcm_reader_destroy(struct PcmReaderContext *context);
+int pcm_reader_destroy(struct PcmReaderContext *context);
 
 #endif // PCM_READER_H

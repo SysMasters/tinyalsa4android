@@ -15,7 +15,7 @@ void *pcm_read_thread(void *arg) {
     while (context->running) {
         if (pcm_read(context->pcm, buffer, size) == 0) {
             if (context->callback) {
-                context->callback(buffer, size);
+                context->callback(buffer, size, (long) context);
             }
         } else {
             fprintf(stderr, "PCM read error\n");
@@ -44,8 +44,9 @@ struct PcmReaderContext *pcm_reader_init(int pcm_card, int pcm_device, PcmDataCa
 
     context->pcm = pcm_open(pcm_card, pcm_device, PCM_IN, &config);
     if (!context->pcm || !pcm_is_ready(context->pcm)) {
-        __android_log_print(ANDROID_LOG_DEBUG, "pcm_reader", "card:%d,device:%d,Unable to open PCM device (%s)",
-                          pcm_card,pcm_device,pcm_get_error(context->pcm));
+        __android_log_print(ANDROID_LOG_DEBUG, "pcm_reader",
+                            "card:%d,device:%d,Unable to open PCM device (%s)",
+                            pcm_card, pcm_device, pcm_get_error(context->pcm));
         fprintf(stderr, "Unable to open PCM device (%s)\n", pcm_get_error(context->pcm));
         free(context);
         return NULL;
@@ -64,12 +65,14 @@ struct PcmReaderContext *pcm_reader_init(int pcm_card, int pcm_device, PcmDataCa
 }
 
 
-void pcm_reader_destroy(struct PcmReaderContext *context) {
-    if (!context) return;
-
+int pcm_reader_destroy(struct PcmReaderContext *context) {
+    if (!context) return -1;
+    int ret = 0;
     context->running = 0;
     pthread_join(context->thread, NULL);
 
-    pcm_close(context->pcm);
+    ret = pcm_close(context->pcm);
     free(context);
+
+    return ret;
 }
