@@ -54,4 +54,8 @@ public class PcmReader {
         void onPcmData(byte[] data);
     }
 
+
+    public PcmConfig getPcmConfig() {
+        return pcmConfig;
+    }
 }
