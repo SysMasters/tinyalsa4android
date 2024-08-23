@@ -16,7 +16,8 @@ struct PcmReaderContext {
 };
 
 // 函数声明
-struct PcmReaderContext *pcm_reader_init(int pcm_card, int pcm_device, PcmDataCallback callback);
+struct PcmReaderContext *
+pcm_reader_init(int pcm_card, int pcm_device, pcm_config config, PcmDataCallback callback);
 
 int pcm_reader_destroy(struct PcmReaderContext *context);
 

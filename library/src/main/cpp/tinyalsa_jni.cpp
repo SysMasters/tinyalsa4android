@@ -1,6 +1,7 @@
 #include <jni.h>
 #include<map>
 #include "pcm_reader.h"
+#include "tinyalsa/pcm.h"
 
 JavaVM *jvm = nullptr;
 std::map<jlong, jobject> javaCallbacks;
@@ -29,9 +30,41 @@ void pcm_data_callback(const void *buffer, size_t size, long handler) {
 extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tinyalas4android_library_PcmReader_nativeInit(JNIEnv *env, jobject obj, jint pcm_card,
-                                                       jint pcm_device) {
+                                                       jint pcm_device, jobject pcmConfig) {
     env->GetJavaVM(&jvm);
-    long handler = (long) pcm_reader_init(pcm_card, pcm_device, pcm_data_callback);
+    jclass cls = env->GetObjectClass(pcmConfig);
+    jmethodID getChannels = env->GetMethodID(cls, "getChannels", "()I");
+    jmethodID getRate = env->GetMethodID(cls, "getRate", "()I");
+    jmethodID getPeriodSize = env->GetMethodID(cls, "getPeriodSize", "()I");
+    jmethodID getPeriodCount = env->GetMethodID(cls, "getPeriodCount", "()I");
+    jmethodID getFormat = env->GetMethodID(cls, "getFormat", "()I");
+    jmethodID getStartThreshold = env->GetMethodID(cls, "getStartThreshold", "()I");
+    jmethodID getStopThreshold = env->GetMethodID(cls, "getStopThreshold", "()I");
+    jmethodID getSilenceThreshold = env->GetMethodID(cls, "getSilenceThreshold", "()I");
+    jint channels = env->CallIntMethod(pcmConfig, getChannels);
+    jint rate = env->CallIntMethod(pcmConfig, getRate);
+    jint periodSize = env->CallIntMethod(pcmConfig, getPeriodSize);
+    jint periodCount = env->CallIntMethod(pcmConfig, getPeriodCount);
+    jint format = env->CallIntMethod(pcmConfig, getFormat);
+    jint startThreshold = env->CallIntMethod(pcmConfig, getStartThreshold);
+    jint stopThreshold = env->CallIntMethod(pcmConfig, getStopThreshold);
+    jint silenceThreshold = env->CallIntMethod(pcmConfig, getSilenceThreshold);
+    struct pcm_config config;
+    memset(&config, 0, sizeof(config));
+    config.channels = channels; // 双声道
+    config.rate = rate; // 采样率 48000Hz
+    config.period_size = periodSize; // 周期大小
+    config.period_count = periodCount; // 周期计数
+    if (format == 16) {
+        config.format = PCM_FORMAT_S16_LE; // 16位小端序格式
+    } else if (format == 32) {
+        config.format = PCM_FORMAT_S32_LE; // 32位小端序格式
+    }
+    config.start_threshold = startThreshold;
+    config.stop_threshold = stopThreshold;
+    config.silence_threshold = silenceThreshold;
+
+    long handler = (long) pcm_reader_init(pcm_card, pcm_device,config, pcm_data_callback);
     javaCallbacks[handler] = env->NewGlobalRef(obj);
     return handler;
 }

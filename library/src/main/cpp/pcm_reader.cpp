@@ -26,21 +26,11 @@ void *pcm_read_thread(void *arg) {
     return NULL;
 }
 
-struct PcmReaderContext *pcm_reader_init(int pcm_card, int pcm_device, PcmDataCallback callback) {
+struct PcmReaderContext *pcm_reader_init(
+        int pcm_card, int pcm_device, pcm_config config, PcmDataCallback callback) {
     struct PcmReaderContext *context = reinterpret_cast<PcmReaderContext *>(malloc(
             sizeof(struct PcmReaderContext)));
     if (!context) return NULL;
-
-    struct pcm_config config;
-    memset(&config, 0, sizeof(config));
-    config.channels = 2; // 双声道
-    config.rate = 48000; // 采样率 48000Hz
-    config.period_size = 512; // 周期大小
-    config.period_count = 2; // 周期计数
-    config.format = PCM_FORMAT_S16_LE; // 16位小端序格式
-    config.start_threshold = 1;
-//    config.stop_threshold = 0;
-//    config.silence_threshold = 0;
 
     context->pcm = pcm_open(pcm_card, pcm_device, PCM_IN, &config);
     if (!context->pcm || !pcm_is_ready(context->pcm)) {

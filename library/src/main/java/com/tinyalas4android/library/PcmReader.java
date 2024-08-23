@@ -10,14 +10,26 @@ public class PcmReader {
     private int pcmDevice;
     private PcmDataCallback callback;
 
+    private PcmConfig pcmConfig;
+
+
+    /**
+     * config.channels = 2; // 双声道
+     * config.rate = 48000; // 采样率 48000Hz
+     * config.period_size = 512; // 周期大小
+     * config.period_count = 2; // 周期计数
+     * config.format = PCM_FORMAT_S16_LE; // 16位小端序格式
+     * config.start_threshold = 1;
+     */
     public PcmReader(int pcmCard, int pcmDevice, PcmDataCallback callback) {
         this.pcmCard = pcmCard;
         this.pcmDevice = pcmDevice;
         this.callback = callback;
+        pcmConfig = new PcmConfig();
     }
 
     public void start() {
-        nativeHandler = nativeInit(pcmCard, pcmDevice);
+        nativeHandler = nativeInit(pcmCard, pcmDevice, pcmConfig);
     }
 
     public void stop() {
@@ -33,7 +45,7 @@ public class PcmReader {
         }
     }
 
-    private native long nativeInit(int pcmCard, int pcmDevice);
+    private native long nativeInit(int pcmCard, int pcmDevice, PcmConfig pcmConfig);
 
     private native int nativeDestroy(long handler);
 
