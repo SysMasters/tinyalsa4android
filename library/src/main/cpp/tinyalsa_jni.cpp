@@ -49,22 +49,10 @@ Java_com_tinyalas4android_library_PcmReader_nativeInit(JNIEnv *env, jobject obj,
     jint startThreshold = env->CallIntMethod(pcmConfig, getStartThreshold);
     jint stopThreshold = env->CallIntMethod(pcmConfig, getStopThreshold);
     jint silenceThreshold = env->CallIntMethod(pcmConfig, getSilenceThreshold);
-    struct pcm_config config;
-    memset(&config, 0, sizeof(config));
-    config.channels = channels; // 双声道
-    config.rate = rate; // 采样率 48000Hz
-    config.period_size = periodSize; // 周期大小
-    config.period_count = periodCount; // 周期计数
-    if (format == 16) {
-        config.format = PCM_FORMAT_S16_LE; // 16位小端序格式
-    } else if (format == 32) {
-        config.format = PCM_FORMAT_S32_LE; // 32位小端序格式
-    }
-    config.start_threshold = startThreshold;
-    config.stop_threshold = stopThreshold;
-    config.silence_threshold = silenceThreshold;
 
-    long handler = (long) pcm_reader_init(pcm_card, pcm_device,config, pcm_data_callback);
+    long handler = (long) pcm_reader_init(pcm_card, pcm_device, channels, rate, periodSize,
+                                          periodCount, format, startThreshold, stopThreshold,
+                                          silenceThreshold, pcm_data_callback);
     javaCallbacks[handler] = env->NewGlobalRef(obj);
     return handler;
 }

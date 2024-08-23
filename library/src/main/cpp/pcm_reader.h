@@ -1,8 +1,9 @@
 #ifndef PCM_READER_H
 #define PCM_READER_H
 
-#include <stddef.h> // for size_t
+#include <cstddef>
 #include <pthread.h>
+#include "include/tinyalsa/pcm.h"
 
 // 数据回调函数类型定义
 typedef void (*PcmDataCallback)(const void *buffer, size_t size, long handler);
@@ -17,7 +18,16 @@ struct PcmReaderContext {
 
 // 函数声明
 struct PcmReaderContext *
-pcm_reader_init(int pcm_card, int pcm_device, pcm_config config, PcmDataCallback callback);
+pcm_reader_init(int pcm_card,
+                int pcm_device,
+                int channels,
+                int sample_rate,
+                int period_size,
+                int period_count,
+                int format,
+                int start_threshold,
+                int stop_threshold,
+                int silence_threshold, PcmDataCallback callback);
 
 int pcm_reader_destroy(struct PcmReaderContext *context);
 

@@ -27,10 +27,35 @@ void *pcm_read_thread(void *arg) {
 }
 
 struct PcmReaderContext *pcm_reader_init(
-        int pcm_card, int pcm_device, pcm_config config, PcmDataCallback callback) {
+        int pcm_card,
+        int pcm_device,
+        int channels,
+        int sample_rate,
+        int period_size,
+        int period_count,
+        int format,
+        int start_threshold,
+        int stop_threshold,
+        int silence_threshold,
+        PcmDataCallback callback) {
     struct PcmReaderContext *context = reinterpret_cast<PcmReaderContext *>(malloc(
             sizeof(struct PcmReaderContext)));
     if (!context) return NULL;
+
+    struct pcm_config config;
+    memset(&config, 0, sizeof(config));
+    config.channels = channels; // 双声道
+    config.rate = sample_rate; // 采样率 48000Hz
+    config.period_size = period_size; // 周期大小
+    config.period_count = period_count; // 周期计数
+    if (format == 16) {
+        config.format = PCM_FORMAT_S16_LE; // 16位小端序格式
+    } else if (format == 32) {
+        config.format = PCM_FORMAT_S32_LE; // 32位小端序格式
+    }
+    config.start_threshold = start_threshold;
+    config.stop_threshold = stop_threshold;
+    config.silence_threshold = silence_threshold;
 
     context->pcm = pcm_open(pcm_card, pcm_device, PCM_IN, &config);
     if (!context->pcm || !pcm_is_ready(context->pcm)) {
