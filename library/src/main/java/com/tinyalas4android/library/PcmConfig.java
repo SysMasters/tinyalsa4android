@@ -42,7 +42,7 @@ public class PcmConfig {
         this.rate = 48000;
         this.periodSize = 1024;
         this.periodCount = 2;
-        this.format = 32;
+        this.format = 16;// 32
         this.startThreshold = 1024;
         this.stopThreshold = 1024 * 2;
         this.silenceThreshold = 1024 * 2;

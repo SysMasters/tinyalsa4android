@@ -54,8 +54,16 @@ struct PcmReaderContext *pcm_reader_init(
         config.format = PCM_FORMAT_S32_LE; // 32位小端序格式
     }
     config.start_threshold = start_threshold;
-    config.stop_threshold = stop_threshold;
-    config.silence_threshold = silence_threshold;
+//    config.stop_threshold = stop_threshold;
+//    config.silence_threshold = silence_threshold;
+
+
+//    config.channels = 2; // 双声道
+//    config.rate = 48000; // 采样率 48000Hz
+//    config.period_size = 512; // 周期大小
+//    config.period_count = 2; // 周期计数
+//    config.format = PCM_FORMAT_S16_LE; // 16位小端序格式
+//    config.start_threshold = 1;
 
     context->pcm = pcm_open(pcm_card, pcm_device, PCM_IN, &config);
     if (!context->pcm || !pcm_is_ready(context->pcm)) {
