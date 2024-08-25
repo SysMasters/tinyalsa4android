@@ -39,9 +39,9 @@ public class PcmReader {
         }
     }
 
-    private void onPcmData(byte[] data) {
+    private void onPcmData(byte[] data, int size) {
         if (callback != null && nativeHandler != -1) {
-            callback.onPcmData(data);
+            callback.onPcmData(data, size);
         }
     }
 
@@ -51,7 +51,7 @@ public class PcmReader {
 
 
     public interface PcmDataCallback {
-        void onPcmData(byte[] data);
+        void onPcmData(byte[] data, int size);
     }
 
 

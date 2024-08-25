@@ -19,8 +19,8 @@ void pcm_data_callback(const void *buffer, size_t size, long handler) {
     jobject javaCallback = javaCallbacks[handler];
     if (javaCallback != nullptr) {
         jclass cls = env->GetObjectClass(javaCallback);
-        jmethodID methodID = env->GetMethodID(cls, "onPcmData", "([B)V");
-        env->CallVoidMethod(javaCallback, methodID, data);
+        jmethodID methodID = env->GetMethodID(cls, "onPcmData", "([BI)V");
+        env->CallVoidMethod(javaCallback, methodID, data, size);
     }
 
     env->DeleteLocalRef(data);

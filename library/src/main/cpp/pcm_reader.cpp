@@ -9,20 +9,49 @@
 
 void *pcm_read_thread(void *arg) {
     struct PcmReaderContext *context = (struct PcmReaderContext *) arg;
-    size_t size = pcm_frames_to_bytes(context->pcm, pcm_get_buffer_size(context->pcm));
-    void *buffer = malloc(size);
+//    size_t size = pcm_frames_to_bytes(context->pcm, pcm_get_buffer_size(context->pcm));
+//    void *buffer = malloc(size);
+
+
+    struct pcm *pcm = context->pcm;
+    unsigned int frame_size = pcm_frames_to_bytes(pcm, 1);
+    unsigned int frames_per_sec = pcm_get_rate(pcm);
+
+    void *frames = malloc(frame_size * frames_per_sec);
+    if (frames == nullptr) {
+        fprintf(stderr, "failed to allocate frames\n");
+        pcm_close(pcm);
+        return nullptr;
+    }
+
 
     while (context->running) {
-        if (pcm_read(context->pcm, buffer, size) == 0) {
+        int read_count = pcm_readi(pcm, frames, frames_per_sec);
+        if (read_count > 0) {
+            size_t byte_count = pcm_frames_to_bytes(pcm, read_count);
             if (context->callback) {
-                context->callback(buffer, size, (long) context);
+                context->callback(frames, byte_count, (long) context);
             }
         } else {
-            fprintf(stderr, "PCM read error\n");
+            fprintf(stderr, "failed to read frames\n");
+            break;
         }
     }
 
-    free(buffer);
+    free(frames);
+    pcm_close(pcm);
+//
+//    while (context->running) {
+//        if (pcm_read(context->pcm, buffer, size) == 0) {
+//            if (context->callback) {
+//                context->callback(buffer, size, (long) context);
+//            }
+//        } else {
+//            fprintf(stderr, "PCM read error\n");
+//        }
+//    }
+//
+//    free(buffer);
     return NULL;
 }
 
@@ -94,7 +123,7 @@ int pcm_reader_destroy(struct PcmReaderContext *context) {
     context->running = 0;
     pthread_join(context->thread, NULL);
 
-    ret = pcm_close(context->pcm);
+//    ret = pcm_close(context->pcm);
     free(context);
 
     return ret;
